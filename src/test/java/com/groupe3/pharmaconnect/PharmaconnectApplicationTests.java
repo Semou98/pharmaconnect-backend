@@ -1,10 +1,10 @@
-package com.demo_mongodb.sec_service;
+package com.groupe3.pharmaconnect;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SecServiceApplicationTests {
+class PharmaconnectApplicationTests {
 
 	@Test
 	void contextLoads() {
