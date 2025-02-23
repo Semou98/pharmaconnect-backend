@@ -3,6 +3,7 @@ package com.groupe3.pharmaconnect.repositories;
 import com.groupe3.pharmaconnect.entities.Medicament;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,4 +21,5 @@ public interface MedicamentRepository extends JpaRepository<Medicament, Long> {
 """)
     Page<Medicament> searchMedicament(String name, Boolean availableOnly, Pageable pageable);
 
+    <T> Range<T> findByNameContainingIgnoreCaseAndPharmacy_SubscriptionActiveTrue(String query, Pageable pageable);
 }
