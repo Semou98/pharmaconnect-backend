@@ -8,7 +8,7 @@ public class MedicamentDTO {
     private String name;
     private String dosage;
     private String sideEffects;
-    private boolean prescriptionRequired;
+    private boolean isPrescriptionRequired;
     private Integer quantityAvailable;
     private Double price;
     private Long pharmacyId;

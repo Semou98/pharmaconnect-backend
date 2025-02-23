@@ -14,4 +14,5 @@ public class OrderDTO {
     private Set<OrderItemDTO> orderItems;
     private OrderStatus status;
     private LocalDateTime orderDate;
+    private double totalPrice;
 }

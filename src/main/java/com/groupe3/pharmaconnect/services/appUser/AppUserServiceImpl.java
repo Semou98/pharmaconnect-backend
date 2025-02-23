@@ -7,15 +7,20 @@ import com.groupe3.pharmaconnect.repositories.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserRepository userRepository;
@@ -23,53 +28,61 @@ public class AppUserServiceImpl implements AppUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public AppUserDTO getUserByEmail(String email) {
-        AppUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("Utilisateur non trouvé avec l'email : " + email));
-        return userMapper.toDTO(user);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
     @Override
     public AppUserDTO createUser(AppUserDTO userDTO) {
-        if (existsByEmail(userDTO.getEmail())) {
-            throw new IllegalArgumentException("Email déjà utilisé");
-        }
         AppUser user = userMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         return userMapper.toDTO(userRepository.save(user));
     }
 
     @Override
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
-    // Autres implémentations des méthodes de l'interface...
-    @Override
     public AppUserDTO updateUser(Long id, AppUserDTO userDTO) {
-        AppUser user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Utilisateur non trouvé avec l'id : " + id));
-        // Mise à jour des champs
-        return userMapper.toDTO(userRepository.save(user));
+        AppUser existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+
+        existingUser.setName(userDTO.getName());
+        existingUser.setEmail(userDTO.getEmail());
+        existingUser.setRoles(userDTO.getRoles());
+
+        return userMapper.toDTO(userRepository.save(existingUser));
     }
 
     @Override
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new NoSuchElementException("Utilisateur non trouvé avec l'id : " + id);
+            throw new ResourceNotFoundException("User not found with id: " + id);
         }
         userRepository.deleteById(id);
     }
 
     @Override
     public AppUserDTO getUserById(Long id) {
-        AppUser user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Utilisateur non trouvé avec l'id : " + id));
-        return userMapper.toDTO(user);
+        return userMapper.toDTO(userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id)));
+    }
+
+    @Override
+    public AppUserDTO getUserByEmail(String email) {
+        return userMapper.toDTO(userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email)));
     }
 
     @Override
     public Page<AppUserDTO> getAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable).map(userMapper::toDTO);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

@@ -1,9 +1,10 @@
 package com.groupe3.pharmaconnect.dto;
 
-import com.groupe3.pharmaconnect.enums.UserRole;
+import com.groupe3.pharmaconnect.enums.AppUserRole;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 public class AppUserDTO {
@@ -11,6 +12,8 @@ public class AppUserDTO {
     private String name;
     private String email;
     private String password;
-    private UserRole role;
+    private Set <AppUserRole> roles;
     private LocalDateTime registrationDate;
+    Set<Long> pharmacyIds;
+
 }

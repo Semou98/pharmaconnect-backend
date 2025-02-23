@@ -1,6 +1,7 @@
 package com.groupe3.pharmaconnect.security.jwt;
 
 import com.groupe3.pharmaconnect.dto.AppUserDTO;
+import com.groupe3.pharmaconnect.enums.AppUserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,8 +17,10 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -34,7 +37,9 @@ public class JwtUtil {
 
     public String generateToken(AppUserDTO userDTO) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", userDTO.getRole().name());
+        claims.put("roles", userDTO.getRoles().stream()
+                .map(AppUserRole::name)
+                .collect(Collectors.toList()));
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -46,12 +51,12 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public List<String> extractRoles(String token) {
+        return extractAllClaims(token).get("roles", List.class);
     }
 
-    public String extractRole(String token) {
-        return extractAllClaims(token).get("role", String.class);
+    public String extractEmail(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
     public Boolean validateToken(String token, AppUserDTO userDTO) {

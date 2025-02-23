@@ -16,4 +16,6 @@ public class OrderItem {
     private Medicament medicament;
 
     private Integer quantity;
+    private Double unitPrice;
+    private Double totalPrice;
 }

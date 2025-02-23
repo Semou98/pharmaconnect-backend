@@ -3,6 +3,7 @@ package com.groupe3.pharmaconnect.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 public class PharmacyDTO {
@@ -16,4 +17,5 @@ public class PharmacyDTO {
     private Double latitude;
     private Double longitude;
     private Long pharmacistId;
+    private Set<Long> medicineIds;
 }

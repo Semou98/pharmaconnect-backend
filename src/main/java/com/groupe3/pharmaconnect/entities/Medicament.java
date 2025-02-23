@@ -20,7 +20,7 @@ public class Medicament {
     private String sideEffects;
 
     @Column(name = "prescription_required")
-    private boolean prescriptionRequired;
+    private boolean isPrescriptionRequired;
 
     @Column(name = "quantity_available")
     private Integer quantityAvailable;
