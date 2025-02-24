@@ -37,7 +37,7 @@ public class AppUser implements UserDetails {
     private Set<AppUserRole> roles = new HashSet<>();
 
     @Column(nullable = false)
-    private LocalDateTime registrationDate;
+    private LocalDateTime registrationDate = LocalDateTime.now();
 
     @Column(nullable = false)
     private boolean enabled = true;

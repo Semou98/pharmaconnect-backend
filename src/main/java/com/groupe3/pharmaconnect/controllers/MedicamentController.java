@@ -3,6 +3,7 @@ package com.groupe3.pharmaconnect.controllers;
 import com.groupe3.pharmaconnect.dto.MedicamentDTO;
 import com.groupe3.pharmaconnect.services.medicament.MedicamentService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +15,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-public class MedicamentC@RestController
+@RestController
 @RequestMapping("/api/v1/medicaments")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class MedicamentController {
     private final MedicamentService medicamentService;
 
@@ -47,15 +49,23 @@ public class MedicamentController {
         return ResponseEntity.ok(medicamentService.getMedicamentById(id));
     }
 
+    @GetMapping
+    public ResponseEntity<Page<MedicamentDTO>> getAllMedicaments(
+            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
+        return ResponseEntity.ok(medicamentService.getAllMedicaments(pageable));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<Page<MedicamentDTO>> searchMedicaments(
             @RequestParam String query,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @RequestParam(required = false, defaultValue = "false") Boolean availableOnly,
+            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
         return ResponseEntity.ok(medicamentService.searchMedicaments(query, pageable));
     }
 
     @GetMapping("/pharmacy/{pharmacyId}")
-    public ResponseEntity<List<MedicamentDTO>> getMedicamentsByPharmacy(@PathVariable Long pharmacyId) {
+    public ResponseEntity<List<MedicamentDTO>> getMedicamentsByPharmacy(
+            @PathVariable Long pharmacyId) {
         return ResponseEntity.ok(medicamentService.getMedicamentsByPharmacy(pharmacyId));
     }
 
@@ -63,7 +73,7 @@ public class MedicamentController {
     @PreAuthorize("hasRole('PHARMACIST') and @pharmacySecurityService.isMedicamentOwner(#id, principal)")
     public ResponseEntity<Void> updateStock(
             @PathVariable Long id,
-            @RequestParam Integer quantity) {
+            @RequestParam @Min(0) Integer quantity) {
         medicamentService.updateStock(id, quantity);
         return ResponseEntity.ok().build();
     }

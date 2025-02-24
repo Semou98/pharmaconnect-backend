@@ -1,5 +1,6 @@
 package com.groupe3.pharmaconnect.controllers;
 
+import com.groupe3.pharmaconnect.dto.DashboardDTO;
 import com.groupe3.pharmaconnect.dto.PharmacyDTO;
 import com.groupe3.pharmaconnect.services.pharmacy.PharmacyService;
 import jakarta.validation.Valid;
@@ -47,12 +48,6 @@ public class PharmacyController {
         return ResponseEntity.ok(pharmacyService.getPharmacyById(id));
     }
 
-    @GetMapping
-    public ResponseEntity<Page<PharmacyDTO>> getAllPharmacies(
-            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
-        return ResponseEntity.ok(pharmacyService.getAllPharmacies(pageable));
-    }
-
     @GetMapping("/search")
     public ResponseEntity<List<PharmacyDTO>> searchPharmaciesByLocation(
             @RequestParam Double latitude,
@@ -73,5 +68,14 @@ public class PharmacyController {
             @PathVariable Long pharmacistId,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(pharmacyService.getPharmaciesByPharmacist(pharmacistId, pageable));
+    }
+
+    @GetMapping("/nearby")
+    public ResponseEntity<Page<PharmacyDTO>> getNearbyPharmacies(
+            @RequestParam Double maxDistance,
+            @RequestParam Double latitude,
+            @RequestParam Double longitude,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(pharmacyService.findNearbyPharmacies(maxDistance, latitude, longitude, pageable));
     }
 }

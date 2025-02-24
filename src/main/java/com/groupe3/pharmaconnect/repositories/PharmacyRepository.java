@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface PharmacyRepository extends JpaRepository<Pharmacy, Long> {
     Page<Pharmacy> findByPharmacistId(Long pharmacistId, Pageable pageable);
@@ -20,4 +23,8 @@ public interface PharmacyRepository extends JpaRepository<Pharmacy, Long> {
             + sin(radians(?2)) * sin(radians(p.latitude)))) <= ?1)
     """)
     Page<Pharmacy> findNearbyPharmacies(Double maxDistance, Double latitude, Double longitude, Pageable pageable);
+
+    List<Pharmacy> findBySubscriptionExpiryBeforeAndSubscriptionActiveTrue(LocalDateTime now);
+
+    List<Pharmacy> findBySubscriptionExpiryBetweenAndSubscriptionActiveTrue(LocalDateTime now, LocalDateTime sevenDaysFromNow);
 }

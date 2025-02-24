@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -81,6 +82,7 @@ public class PharmaconnectApplication {
 					newUser.setPassword(passwordEncoder.encode(user.password));
 					newUser.setRoles(user.roles);
 					newUser.setEnabled(true);
+					newUser.setRegistrationDate(LocalDateTime.now());
 
 					appUserRepository.save(newUser);
 					log.info("Created user: {} with roles: {}", email, user.roles);
